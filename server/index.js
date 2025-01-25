@@ -40,8 +40,13 @@ app.get('/', (req, res) => {
 
 
 app.get('/demo', (req, res) => {
-    res.send('Demo working');
-})
+    try {
+        res.send('Demo working');
+    } catch (error) {
+        console.error('Error in /demo route:', error.message);
+        res.status(500).send('Internal Server Error');
+    }
+});
 
 
 app.get('/payment', async (req, res) => {
