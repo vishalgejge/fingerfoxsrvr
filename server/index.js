@@ -87,12 +87,21 @@ app.post('/verify', async (req, res) => {
 
         let { orderId } = req.body;
         
-        Cashfree.PGOrderFetchPayments("2023-08-01",orderId).then((response) => {
+       Cashfree.PGCreateOrder("2023-08-01", request)
+      .then((response) => {
+        if (response && response.data) {
+          console.log('Payment response:', response.data);
+          res.json(response.data);
+        } else {
+          console.error('No response data from Cashfree');
+          res.status(500).send('Failed to create order');
+        }
+      })
+      .catch((error) => {
+        console.error('Error from Cashfree:', error.message || error);
+        res.status(500).send('Cashfree API Error');
+      });
 
-            res.json(response.data);
-        }).catch(error => {
-            console.error(error.response.data.message);
-        })
 
 
     } catch (error) {
