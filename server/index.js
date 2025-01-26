@@ -16,7 +16,7 @@ app.use(express.urlencoded({
 }));
 
 
-
+3
 Cashfree.XClientId = process.env.CLIENT_ID;
 Cashfree.XClientSecret = process.env.CLIENT_SECRET;
 Cashfree.XEnvironment = Cashfree.Environment.PRODUCTION;
@@ -45,39 +45,36 @@ app.get('/demo', (req, res) => {
 
 
 app.get('/payment', async (req, res) => {
+
     try {
+        
         let request = {
-            order_amount: 1.49,
-            order_currency: "INR",
-            order_id: await generateOrderId(),
-            customer_details: {
-                customer_id: "webcodder01",
-                customer_phone: "9999999999",
-                customer_name: "Web Codder",
-                customer_email: "webcodder@example.com",
+            "order_amount": 1.49,
+            "order_currency": "INR",
+            "order_id": await generateOrderId(),
+            "customer_details": {
+                "customer_id": "webcodder01",
+                "customer_phone": "9999999999",
+                "customer_name": "Web Codder",
+                "customer_email": "webcodder@example.com"
             },
-        };
+        }
 
-        console.log('Request to Cashfree:', request);
+        Cashfree.PGCreateOrder("2023-08-01",request).then(response => {
+            console.log(response.data);
+            res.json(response.data);
 
-        await Cashfree.PGCreateOrder("2023-08-01", request)
-            .then((response) => {
-                console.log('Cashfree Response:', response.data);
-                res.json(response.data);
-            })
-            .catch((error) => {
-                console.error('Cashfree API Error:', error.response?.data || error.message);
-                res.status(500).json({
-                    error: 'Cashfree API error',
-                    details: error.response?.data || 'Authentication or configuration issue',
-                });
-            });
+        }).catch(error => {
+            console.error(error.response.data.message);
+        })
+
+
     } catch (error) {
-        console.error('Server Error:', error);
-        res.status(500).json({ error: 'Internal Server Error', details: error.message });
+        console.log(error);
     }
-});
 
+
+})
 
 app.post('/verify', async (req, res) => {
 
