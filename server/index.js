@@ -10,11 +10,16 @@ require('dotenv').config();
 
 const app = express();
 
+
+// Apply CORS middleware with proper configuration
 const corsOptions = {
-    origin: "https://cashfreeclient.vercel.app", // Allow your frontend origin
-    methods: ["GET", "POST"], // Specify allowed HTTP methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Specify allowed headers
+    origin: "https://cashfreeclient.vercel.app", // Replace with your frontend domain
+    methods: ["GET", "POST", "OPTIONS"], // Allow these HTTP methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Allow these headers
+    credentials: true, // Allow cookies if needed
 };
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({
@@ -70,19 +75,23 @@ app.get('/payment', async (req, res) => {
             },
         };
 
+        console.log("Request sent to Cashfree:", request);
+
         const response = await Cashfree.PGCreateOrder("2023-08-01", request);
+
         if (response.data) {
-            console.log(response.data);
+            console.log("Response from Cashfree:", response.data);
             res.json(response.data);
         } else {
-            console.error("Cashfree response is empty");
+            console.error("Empty response from Cashfree");
             res.status(500).send("Failed to create order");
         }
     } catch (error) {
-        console.error("Error in /payment:", error.message || error);
+        console.error("Error in /payment route:", error.message || error);
         res.status(500).send("Internal Server Error");
     }
 });
+
 
 
 app.post('/verify', async (req, res) => {
