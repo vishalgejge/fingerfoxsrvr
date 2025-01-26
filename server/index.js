@@ -9,7 +9,13 @@ const {
 require('dotenv').config();
 
 const app = express();
-app.use(cors());
+
+const corsOptions = {
+    origin: "https://cashfreeclient.vercel.app", // Allow your frontend origin
+    methods: ["GET", "POST"], // Specify allowed HTTP methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Specify allowed headers
+};
+
 app.use(express.json());
 app.use(express.urlencoded({
     extended: true
