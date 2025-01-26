@@ -62,34 +62,31 @@ app.get('/demo', (req, res) => {
 
 app.get('/payment', async (req, res) => {
     try {
-        console.log("Received /payment request");
-        const orderId = generateOrderId();
-        const request = {
+        let request = {
             order_amount: 1.49,
             order_currency: "INR",
-            order_id: orderId,
+            order_id: await generateOrderId(),
             customer_details: {
                 customer_id: "webcodder01",
                 customer_phone: "9999999999",
                 customer_name: "Web Codder",
-                customer_email: "webcodder@example.com",
+                customer_email: "webcodder@example.com"
             },
         };
 
-        console.log("Request sent to Cashfree:", request);
+        Cashfree.PGCreateOrder("2023-08-01", request)
+            .then(response => {
+                console.log('Cashfree Response:', response.data); // Log successful response
+                res.json(response.data);
+            })
+            .catch(error => {
+                console.error('Cashfree API Error:', error.response?.data || error.message); // Log Cashfree error
+                res.status(500).json({ error: 'Cashfree API error', details: error.response?.data });
+            });
 
-        const response = await Cashfree.PGCreateOrder("2023-08-01", request);
-
-        if (response.data) {
-            console.log("Response from Cashfree:", response.data);
-            res.json(response.data);
-        } else {
-            console.error("Empty response from Cashfree");
-            res.status(500).send("Failed to create order");
-        }
     } catch (error) {
-        console.error("Error in /payment route:", error.message || error);
-        res.status(500).send("Internal Server Error");
+        console.error('Server Error:', error); // Log unexpected server errors
+        res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
 });
 
