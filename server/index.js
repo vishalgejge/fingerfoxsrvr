@@ -62,6 +62,7 @@ app.get('/demo', (req, res) => {
 
 app.get('/payment', async (req, res) => {
     try {
+        console.log("Received /payment request");
         const orderId = generateOrderId();
         const request = {
             order_amount: 1.49,
