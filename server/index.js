@@ -56,36 +56,34 @@ app.get('/demo', (req, res) => {
 
 
 app.get('/payment', async (req, res) => {
-
     try {
-        
-        let request = {
-            "order_amount": 1.49,
-            "order_currency": "INR",
-            "order_id": await generateOrderId(),
-            "customer_details": {
-                "customer_id": "webcodder01",
-                "customer_phone": "9999999999",
-                "customer_name": "Web Codder",
-                "customer_email": "webcodder@example.com"
+        const orderId = generateOrderId();
+        const request = {
+            order_amount: 1.49,
+            order_currency: "INR",
+            order_id: orderId,
+            customer_details: {
+                customer_id: "webcodder01",
+                customer_phone: "9999999999",
+                customer_name: "Web Codder",
+                customer_email: "webcodder@example.com",
             },
-        }
+        };
 
-        Cashfree.PGCreateOrder("2023-08-01",request).then(response => {
+        const response = await Cashfree.PGCreateOrder("2023-08-01", request);
+        if (response.data) {
             console.log(response.data);
             res.json(response.data);
-
-        }).catch(error => {
-            console.error(error.response.data.message);
-        })
-
-
+        } else {
+            console.error("Cashfree response is empty");
+            res.status(500).send("Failed to create order");
+        }
     } catch (error) {
-        console.log(error);
+        console.error("Error in /payment:", error.message || error);
+        res.status(500).send("Internal Server Error");
     }
+});
 
-
-})
 
 app.post('/verify', async (req, res) => {
 
